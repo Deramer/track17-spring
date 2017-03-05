@@ -63,13 +63,12 @@ public class CountWords {
                 Long.parseLong(line);
             } catch (Exception e) {
                 if (!line.equals("")) {
-                    if (!result.toString().equals("")) {
-                        result.append(" ");
-                    }
                     result.append(line);
+                    result.append(" ");
                 }
             }
         }
+        result.setLength((result.length() != 0) ? result.length() - 1 : 0);
         return result.toString();
     }
 
