@@ -12,9 +12,10 @@ import java.util.NoSuchElementException;
 public class MyArrayList extends List {
 
     private int[] array;
+    private static final int defaultCapacity = 10;
 
     public MyArrayList() {
-        array = new int[10];
+        array = new int[defaultCapacity];
         size = 0;
     }
 
@@ -22,7 +23,7 @@ public class MyArrayList extends List {
         if (capacity >= 0) {
             array = new int[capacity];
         } else {
-            array = new int[10];
+            array = new int[defaultCapacity];
         }
         size = 0;
     }

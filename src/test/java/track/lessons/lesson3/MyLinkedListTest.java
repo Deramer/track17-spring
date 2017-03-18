@@ -66,51 +66,41 @@ public class MyLinkedListTest {
 
     @Test
     public void stackAddRemove() throws Exception {
-        MyLinkedList list = new MyLinkedList();
-        list.add(1);
+        Stack list = new MyLinkedList();
+        list.push(1);
         list.push(2);
-        list.add(3);
-
-        Assert.assertEquals(3, list.size());
+        list.push(3);
 
         Assert.assertEquals(3, list.pop());
 
-        Assert.assertEquals(2, list.get(1));
         Assert.assertEquals(2, list.pop());
 
         Assert.assertEquals(1, list.pop());
-
-        Assert.assertTrue(list.size() == 0);
     }
 
     @Test
     public void queueAddRemove() throws Exception {
-        MyLinkedList list = new MyLinkedList();
-        list.add(1);
+        Queue list = new MyLinkedList();
+        list.enqueue(1);
         list.enqueue(2);
         list.enqueue(3);
 
-        Assert.assertEquals(3, list.size());
-
-        Assert.assertEquals(3, list.pop());
-
         Assert.assertEquals(1, list.dequeue());
-        Assert.assertEquals(2, list.get(0));
 
         Assert.assertEquals(2, list.dequeue());
 
-        Assert.assertTrue(list.size() == 0);
+        Assert.assertEquals(3, list.dequeue());
     }
 
     @Test(expected = NoSuchElementException.class)
     public void stackPopException() throws Exception {
-        MyLinkedList list = new MyLinkedList();
+        Stack list = new MyLinkedList();
         list.pop();
     }
 
     @Test(expected = NoSuchElementException.class)
     public void stackQueueException() throws Exception {
-        MyLinkedList list = new MyLinkedList();
+        Queue list = new MyLinkedList();
         list.dequeue();
     }
 }
