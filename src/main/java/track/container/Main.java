@@ -1,11 +1,17 @@
 package track.container;
 
+import track.container.config.Bean;
+import track.container.config.InvalidConfigurationException;
+
+import java.io.File;
+import java.util.List;
+
 /**
  *
  */
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidConfigurationException {
 
         /*
 
@@ -20,7 +26,21 @@ public class Main {
 //
 //        Car car = (Car) container.getByClass("track.container.beans.Car");
 //        car = (Car) container.getById("carBean");
+        JsonConfigReader reader = new JsonConfigReader();
+        List<Bean> beans = reader.parseBeans(new File("json_beans"));
+        for (Bean bean : beans) {
+            if (bean.getId().equals("Car")) {
+                try {
+                    Class<?> carClass = Class.forName(bean.getClassName());
+                    carClass.getConstructor();
+                } catch (ClassNotFoundException e) {
+                    //
+                } catch (NoSuchMethodException e) {
+                    //
+                }
 
+            }
+        }
 
     }
 }
