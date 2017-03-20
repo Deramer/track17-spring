@@ -21,6 +21,7 @@ public class JsonConfigReader implements ConfigReader {
         try {
             return Arrays.asList(mapper.readValue(configFile, Bean[].class));
         } catch (IOException e) {
+            System.out.println(e);
             return null;
         }
     }
