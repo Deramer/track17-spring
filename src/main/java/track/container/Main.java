@@ -26,33 +26,10 @@ public class Main {
 //
 //        Car car = (Car) container.getByClass("track.container.beans.Car");
 //        car = (Car) container.getById("carBean");
-        /*
-        JsonConfigReader reader = new JsonConfigReader();
-        List<Bean> beans = reader.parseBeans(new File("json_beans"));
-        for (Bean bean : beans) {
-            if (bean.getId().equals("Car")) {
-                try {
-                    Class<?> carClass = Class.forName(bean.getClassName());
-                    carClass.getConstructor();
-                } catch (ClassNotFoundException e) {
-                    //
-                } catch (NoSuchMethodException e) {
-                    //
-                }
 
-            }
-
-        }
-        */
         JsonConfigReader reader = new JsonConfigReader();
-        try {
-            File file = new File("/home/arseniy/progs/java/track17-spring/src/main/resources/config.json");
-            FileReader br = new FileReader(file);
-        } catch (FileNotFoundException e) {
-            System.out.println("Hell!");
-        }
         List<Bean> beans = reader.parseBeans(new File(
-                "/home/arseniy/progs/java/track17-spring/src/main/resources/config.json"));
+                "src/main/resources/config.json"));
         for (Bean bean: beans) {
             System.out.println(bean);
         }
