@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import track.container.config.Bean;
+import track.container.config.InvalidConfigurationException;
 import track.container.config.Property;
 import track.container.config.ValueType;
 
@@ -50,7 +51,7 @@ public class Container {
             return bean;
         }
 
-        public boolean ifCreated() {
+        public boolean isCreated() {
             return created;
         }
 
@@ -63,21 +64,19 @@ public class Container {
         private ArrayList<Node> roots;
 
         public Tree(List<Bean> beans) {
-            roots = new ArrayList<Node>();
+            roots = new ArrayList<>();
             HashMap<String, Node> idToNode = new HashMap<>();
             HashMap<String, ArrayList<String>> childIdToParentId = new HashMap<>();
-            //HashMap<String, ArrayList<String>> parentIdToChildId = new HashMap<>();
 
             for (Bean bean : beans) {
                 Node node = new Node(bean);
                 idToNode.put(bean.getId(), node);
                 Map<String, Property> properties = bean.getProperties();
                 for (String name : properties.keySet()) {
-                    if (properties.get(name).getType() == ValueType.REF) {
-                        childIdToParentId.putIfAbsent(name, new ArrayList<>());
-                        //parentIdToChildId.putIfAbsent(name, new ArrayList<>());
-                        childIdToParentId.get(name).add(bean.getId());
-                        //parentIdToChildId.get(bean.getId()).add(name);
+                    Property property = properties.get(name);
+                    if (property.getType() == ValueType.REF) {
+                        childIdToParentId.putIfAbsent(property.getValue(), new ArrayList<>());
+                        childIdToParentId.get(property.getValue()).add(bean.getId());
                     }
                 }
             }
@@ -97,7 +96,7 @@ public class Container {
         }
 
         private boolean recursiveCycleCheck(Node node) {
-            if (node.ifCreated()) {
+            if (node.isCreated()) {
                 return true;
             }
             node.setCreated(true);
@@ -108,7 +107,7 @@ public class Container {
                     break;
                 }
             }
-            node.setCreated(true);
+            node.setCreated(false);
             return result;
         }
 
@@ -122,7 +121,35 @@ public class Container {
             return false;
         }
 
+        private Object castAttempt(Class type, String value) {
+            if (type == long.class) {
+                return Long.parseLong(value);
+            }
+            if (type == int.class) {
+                return Integer.parseInt(value);
+            }
+            if (type == short.class) {
+                return Short.parseShort(value);
+            }
+            if (type ==  byte.class) {
+                return Byte.parseByte(value);
+            }
+            if (type ==  double.class) {
+                return Double.parseDouble(value);
+            }
+            if (type ==  float.class) {
+                return Float.parseFloat(value);
+            }
+            if (type == boolean.class) {
+                return Boolean.parseBoolean(value);
+            }
+            return type.cast(value);
+        }
+
         private void recursiveInstantiation(Node node) {
+            if (node.isCreated()) {
+                return;
+            }
             for (Node child : node.getChildren()) {
                 recursiveInstantiation(child);
             }
@@ -135,18 +162,22 @@ public class Container {
                 objectsByClass.put(bean.getClassName(), newObj);
                 Map<String, Property> properties = bean.getProperties();
                 for (String name : properties.keySet()) {
-                    String withGet = properties.get(name).getName();
-                    withGet = withGet.substring(0,1).toUpperCase() + withGet.substring(1);
-                    Method method = cls.getMethod("set" + withGet);
-                    if (properties.get(name).getType() == ValueType.REF) {
-                        method.invoke(newObj, objectsById.get(properties.get(name).getValue()));
-                    } else {
-                        method.invoke(newObj, properties.get(name).getValue());
+                    Property property = properties.get(name);
+                    String withSet = property.getName();
+                    withSet = withSet.substring(0,1).toUpperCase() + withSet.substring(1);
+                    Method[] methods = cls.getMethods();
+                    for (Method method : methods) {
+                        if (method.getName().equals("set" + withSet)) {
+                            if (property.getType() == ValueType.REF) {
+                                method.invoke(newObj, objectsById.get(property.getValue()));
+                            } else {
+                                Class<?>[] types = method.getParameterTypes();
+                                method.invoke(newObj, castAttempt(types[0], property.getValue()));
+                            }
+                            break;
+                        }
                     }
-
                 }
-
-
             } catch (ClassNotFoundException cnfe) {
                 cnfe.printStackTrace();
             } catch (NoSuchMethodException sme) {
@@ -158,7 +189,6 @@ public class Container {
             } catch (InvocationTargetException ite) {
                 ite.printStackTrace();
             }
-                //Constructor[] ctors = Class
             node.setCreated(true);
         }
 
@@ -170,8 +200,14 @@ public class Container {
     }
 
     // Реализуйте этот конструктор, используется в тестах!
-    public Container(List<Bean> beans) {
-
+    public Container(List<Bean> beans) throws InvalidConfigurationException {
+        objectsByClass = new HashMap<>();
+        objectsById = new HashMap<>();
+        Tree tree = new Tree(beans);
+        if (tree.checkForCycles()) {
+            throw new InvalidConfigurationException("Cycles in the dependencies.");
+        }
+        tree.instantiate();
     }
 
     /**
@@ -179,7 +215,7 @@ public class Container {
      *  Например, Car car = (Car) container.getById("carBean")
      */
     public Object getById(String id) {
-        return null;
+        return objectsById.get(id);
     }
 
     /**
@@ -187,6 +223,6 @@ public class Container {
      * Например, Car car = (Car) container.getByClass("track.container.beans.Car")
      */
     public Object getByClass(String className) {
-        return null;
+        return objectsByClass.get(className);
     }
 }

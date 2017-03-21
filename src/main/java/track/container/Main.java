@@ -26,12 +26,5 @@ public class Main {
 //
 //        Car car = (Car) container.getByClass("track.container.beans.Car");
 //        car = (Car) container.getById("carBean");
-
-        JsonConfigReader reader = new JsonConfigReader();
-        List<Bean> beans = reader.parseBeans(new File(
-                "src/main/resources/config.json"));
-        for (Bean bean: beans) {
-            System.out.println(bean);
-        }
     }
 }
