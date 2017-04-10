@@ -1,10 +1,6 @@
 package track.lessons.lesson5generics;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import track.util.Util;
 
@@ -25,6 +21,7 @@ public class Cypher {
                 }
                 // Если это буква, то собираем частотную информацию
 
+                map.put(ch, map.get(ch) == null ? 1 : map.get(ch) + 1);
 
 
             }
@@ -45,10 +42,24 @@ public class Cypher {
         обратно в Map для того, чтобы иметь быстрый доступ get().
 
      */
+    private class EntryComparator implements Comparator<Map.Entry<Character, Integer>> {
+
+        @Override
+        public int compare(Map.Entry<Character, Integer> v1, Map.Entry<Character, Integer> v2) {
+            return v2.getValue().compareTo(v1.getValue());
+        }
+    }
+
     public Map<Character, Integer> buildHist(String data) {
         Map<Character, Integer> map = readData(data);
-
-        return null;
+        List<Map.Entry<Character, Integer>> list = new ArrayList<>(map.entrySet());
+        list.sort(new EntryComparator());
+        LinkedHashMap<Character, Integer> newMap = new LinkedHashMap<>();
+        for (int ind = 0; ind < list.size(); ind++) {
+            Map.Entry<Character, Integer> entry = list.get(ind);
+            newMap.put(entry.getKey(), entry.getValue());
+        }
+        return newMap;
     }
 
     /**
@@ -60,7 +71,16 @@ public class Cypher {
      * @return расшифрованный текст
      */
     public String merge(List<Character> in, List<Character> out, String encrypted) {
-        return null;
+        StringBuilder builder = new StringBuilder();
+        for (Character ch : encrypted.toCharArray()) {
+            //System.out.print(ch);
+            try {
+                builder.append(in.get(out.indexOf(ch)));
+            } catch (IndexOutOfBoundsException e) {
+                //
+            }
+        }
+        return builder.toString();
     }
 
     public static void main(String[] args) {

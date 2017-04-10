@@ -32,7 +32,7 @@ public class Util {
         String data = text.toLowerCase().trim();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < data.length(); i++) {
-            if (data.charAt(i) == ' ') {
+            if (data.charAt(i) < 'a' && data.charAt(i) > 'z') {
                 continue;
             }
             builder.append(shift(data.charAt(i), SHIFT));
