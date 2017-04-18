@@ -1,6 +1,5 @@
 package track.msgtest.messenger.net;
 
-
 import track.msgtest.messenger.messages.Message;
 
 /**
