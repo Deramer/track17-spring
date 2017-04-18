@@ -9,7 +9,7 @@ public interface MessageStore {
     /**
      * получаем список ид пользователей заданного чата
      */
-    List<Long> getChatsByUserId(Long userId);
+    List<Long> getUsersIdFromChat(Long chatId);
 
     /**
      * получить информацию о чате
@@ -19,21 +19,21 @@ public interface MessageStore {
     /**
      * Список сообщений из чата
      */
-    List<Long> getMessagesFromChat(Long chatId);
+    //List<Long> getMessagesFromChat(Long chatId);
 
     /**
      * Получить информацию о сообщении
      */
-    Message getMessageById(Long messageId);
+    //Message getMessageById(Long messageId);
 
     /**
      * Добавить сообщение в чат
      */
-    void addMessage(Long chatId, Message message);
+    //void addMessage(Long chatId, Message message);
 
     /**
      * Добавить пользователя к чату
      */
-    void addUserToChat(Long userId, Long chatId);
+    //void addUserToChat(Long userId, Long chatId);
 
 }
