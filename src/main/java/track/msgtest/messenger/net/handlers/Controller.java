@@ -17,6 +17,7 @@ public class Controller {
         map.put(Type.MSG_TEXT, new TextHandler());
         map.put(Type.MSG_SIGNUP, new SignUpHandler());
         map.put(Type.MSG_INFO, new InfoHandler());
+        map.put(Type.MSG_CHAT_LIST, new ChatListHandler());
     }
 
     public Handler handler(Type type) {

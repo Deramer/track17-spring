@@ -31,4 +31,5 @@ public interface MessageStore {
      */
     void addUserToChat(Long userId, Long chatId);
 
+    List<Long> getChatsByUserId(Long userId);
 }

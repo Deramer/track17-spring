@@ -130,8 +130,16 @@ public class MessengerClient {
                 System.out.println("ID: " + ((InfoResultMessage)msg).getUserId());
                 System.out.println("name: " + ((InfoResultMessage)msg).getName());
                 break;
+            case MSG_CHAT_LIST_RESULT:
+                System.out.println("Chats:");
+                for (Long chatId : ((ChatListResultMessage)msg).getChatsId()) {
+                    System.out.print(chatId + " ");
+                }
+                System.out.println("");
+                break;
             default:
                 System.out.println("Not supported type of message");
+                log.warn("Not supported type of message, {}", msg.getType());
                 break;
         }
     }
@@ -194,6 +202,11 @@ public class MessengerClient {
                     }
                 }
                 send(infoMessage);
+                break;
+            case "/chat_list":
+                ChatListMessage chatListMessage = new ChatListMessage();
+                chatListMessage.setType(Type.MSG_CHAT_LIST);
+                send(chatListMessage);
                 break;
             default:
                 log.error("Invalid input: " + line);

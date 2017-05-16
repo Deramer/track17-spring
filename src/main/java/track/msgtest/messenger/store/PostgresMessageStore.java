@@ -24,6 +24,7 @@ public class PostgresMessageStore implements MessageStore {
     private PreparedStatement selectMessageByIdStatement;
     private PreparedStatement insertMessageStatement;
     private PreparedStatement insertUserToChatStatement;
+    private PreparedStatement selectChatsByUserStatement;
 
     public PostgresMessageStore(Connection connection) {
         this.connection = connection;
@@ -32,6 +33,7 @@ public class PostgresMessageStore implements MessageStore {
         String selectMessageByIdQuery = "SELECT from_id, text, timestamp FROM Messages WHERE id = ?;";
         String insertMessageQuery = "INSERT INTO Messages (from_id, to_id, text, timestamp) VALUES (?, ?, ?, now());";
         String insertUserToChatQuery = "INSERT INTO Chats (id, member_id) VALUES (?, ?);";
+        String selectChatsByUserQuery = "SELECT id FROM Chats WHERE member_id = ?;";
         try {
             selectMessageByIdStatement = this.connection.prepareStatement(selectMessageByIdQuery);
         } catch (SQLException e) {
@@ -56,6 +58,11 @@ public class PostgresMessageStore implements MessageStore {
             insertUserToChatStatement = this.connection.prepareStatement(insertUserToChatQuery);
         } catch (SQLException e) {
             log.error("Couldn't prepare selectMessageById", e);
+        }
+        try {
+            selectChatsByUserStatement = this.connection.prepareStatement(selectChatsByUserQuery);
+        } catch (SQLException e) {
+            log.error("Couldn't prepare selectChatsByUser", e);
         }
     }
 
@@ -137,6 +144,23 @@ public class PostgresMessageStore implements MessageStore {
             insertUserToChatStatement.clearParameters();
         } catch (SQLException e) {
             log.error("Couldn't add user to chat", e);
+        }
+    }
+
+    @Override
+    public synchronized List<Long> getChatsByUserId(Long userId) {
+        try {
+            selectChatsByUserStatement.setLong(1, userId);
+            ResultSet resultSet = selectChatsByUserStatement.executeQuery();
+            selectChatsByUserStatement.clearParameters();
+            List<Long> result = new ArrayList<>();
+            while (resultSet.next()) {
+                result.add(resultSet.getLong(1));
+            }
+            return result;
+        } catch (SQLException e) {
+            log.error("Db error", e);
+            return null;
         }
     }
 }
