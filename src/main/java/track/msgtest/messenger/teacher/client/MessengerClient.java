@@ -45,6 +45,8 @@ public class MessengerClient {
     private InputStream in;
     private OutputStream out;
 
+    private boolean isActive = true;
+
     public Protocol getProtocol() {
         return protocol;
     }
@@ -69,6 +71,14 @@ public class MessengerClient {
         this.host = host;
     }
 
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
     public void initSocket() throws IOException {
         Socket socket = new Socket(host, port);
         in = socket.getInputStream();
@@ -80,7 +90,7 @@ public class MessengerClient {
         Thread socketListenerThread = new Thread(() -> {
             final byte[] buf = new byte[1024 * 64];
             log.info("Starting listener thread...");
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!Thread.currentThread().isInterrupted() && isActive == true) {
                 try {
                     // Здесь поток блокируется на ожидании данных
                     int read = in.read(buf);
@@ -91,10 +101,12 @@ public class MessengerClient {
                         onMessage(msg);
                     } else {
                         log.info("End of stream.");
+                        isActive = false;
                         Thread.currentThread().interrupt();
                     }
                 } catch (Exception e) {
                     log.error("Failed to process connection: {}", e);
+                    isActive = false;
                     e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
@@ -175,15 +187,18 @@ public class MessengerClient {
             // Цикл чтения с консоли
             Scanner scanner = new Scanner(System.in);
             System.out.println("$");
-            while (true) {
+            while (client.getIsActive()) {
                 String input = scanner.nextLine();
                 if ("q".equals(input)) {
+                    client.setIsActive(false);
                     return;
                 }
                 try {
                     client.processInput(input);
-                } catch (ProtocolException | IOException | UserErrorException e) {
+                } catch (ProtocolException | IOException e) {
                     log.error("Failed to process user input", e);
+                } catch (UserErrorException e) {
+                    log.info("Invalid input, {}", e.getMessage());
                 }
             }
         } catch (Exception e) {

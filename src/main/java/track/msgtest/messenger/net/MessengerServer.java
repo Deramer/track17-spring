@@ -44,7 +44,7 @@ public class MessengerServer {
 
             SocketAddress clientAddress = clntSock.getRemoteSocketAddress();
             log.info("Handling client at " + clientAddress);
-            pool.execute(new Session(clntSock, new StringProtocol(), userStore, messageStore));
+            pool.submit(new Session(clntSock, new StringProtocol(), userStore, messageStore));
         }
     }
 

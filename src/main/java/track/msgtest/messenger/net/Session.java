@@ -26,7 +26,7 @@ import track.msgtest.messenger.store.UserStore;
  */
 public class Session implements Runnable {
     private static Logger log = LoggerFactory.getLogger(Session.class);
-    private static volatile HashMap<Long, Session> userSessionMap;
+    private static final HashMap<Long, Session> userSessionMap = new HashMap<>();
 
     private UserStore userStore;
     private MessageStore messageStore;
@@ -51,8 +51,6 @@ public class Session implements Runnable {
         out = socket.getOutputStream();
 
         isActive = true;
-
-        userSessionMap = new HashMap<>();
     }
 
     public synchronized void send(Message msg) throws ProtocolException, IOException {
@@ -67,9 +65,11 @@ public class Session implements Runnable {
 
     public void close() {
         try {
+            log.info("Closing connection to {}", socket.getRemoteSocketAddress());
             in.close();
             out.close();
             socket.close();
+            userSessionMap.remove(user.getId(), this);
         } catch (IOException e) {
             log.error("Couldn't close socket, {}", e);
         }
