@@ -25,6 +25,8 @@ public class PostgresMessageStore implements MessageStore {
     private PreparedStatement insertMessageStatement;
     private PreparedStatement insertUserToChatStatement;
     private PreparedStatement selectChatsByUserStatement;
+    private PreparedStatement selectChatIdByUsersIdStatement;
+    private PreparedStatement selectMaxChatStatement;
 
     public PostgresMessageStore(Connection connection) {
         this.connection = connection;
@@ -34,6 +36,10 @@ public class PostgresMessageStore implements MessageStore {
         String insertMessageQuery = "INSERT INTO Messages (from_id, to_id, text, timestamp) VALUES (?, ?, ?, now());";
         String insertUserToChatQuery = "INSERT INTO Chats (id, member_id) VALUES (?, ?);";
         String selectChatsByUserQuery = "SELECT id FROM Chats WHERE member_id = ?;";
+        String selectChatIdByUsersIdQuery = "SELECT id FROM (SELECT * FROM Chats WHERE member_id = ANY (?)) ";
+        selectChatIdByUsersIdQuery += "AS M1 RIGHT JOIN Chats AS M2 USING (id, member_id) GROUP BY M2.id ";
+        selectChatIdByUsersIdQuery += "HAVING count(M2.id) = count(M1.id) AND count(M1.id) = ?;";
+        String selectMaxChatQuery = "SELECT coalesce(max(id), 0) + 1 FROM Chats;";
         try {
             selectMessageByIdStatement = this.connection.prepareStatement(selectMessageByIdQuery);
         } catch (SQLException e) {
@@ -63,6 +69,16 @@ public class PostgresMessageStore implements MessageStore {
             selectChatsByUserStatement = this.connection.prepareStatement(selectChatsByUserQuery);
         } catch (SQLException e) {
             log.error("Couldn't prepare selectChatsByUser", e);
+        }
+        try {
+            selectChatIdByUsersIdStatement = this.connection.prepareStatement(selectChatIdByUsersIdQuery);
+        } catch (SQLException e) {
+            log.error("Couldn't prepare selectChatByUsers", e);
+        }
+        try {
+            selectMaxChatStatement = this.connection.prepareStatement(selectMaxChatQuery);
+        } catch (SQLException e) {
+            log.error("Couldn't prepare selectMaxChat", e);
         }
     }
 
@@ -158,6 +174,34 @@ public class PostgresMessageStore implements MessageStore {
                 result.add(resultSet.getLong(1));
             }
             return result;
+        } catch (SQLException e) {
+            log.error("Db error", e);
+            return null;
+        }
+    }
+
+    @Override
+    public synchronized Long getOrAddChatWithUsers(List<Long> usersId) {
+        try {
+            selectChatIdByUsersIdStatement.setArray(1, connection.createArrayOf("bigint", usersId.toArray()));
+            selectChatIdByUsersIdStatement.setInt(2, usersId.size());
+            ResultSet resultSet = selectChatIdByUsersIdStatement.executeQuery();
+            selectChatIdByUsersIdStatement.clearParameters();
+            if (resultSet.next()) {
+                return resultSet.getLong(1);
+            } else {
+                ResultSet maxRes = selectMaxChatStatement.executeQuery();
+                Long chatId;
+                if (maxRes.next()) {
+                    chatId = maxRes.getLong(1);
+                } else {
+                    chatId = 1L;
+                }
+                for (Long userId : usersId) {
+                    addUserToChat(userId, chatId);
+                }
+                return chatId;
+            }
         } catch (SQLException e) {
             log.error("Db error", e);
             return null;

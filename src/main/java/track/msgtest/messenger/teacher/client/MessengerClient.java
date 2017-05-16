@@ -4,7 +4,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -207,6 +209,24 @@ public class MessengerClient {
                 ChatListMessage chatListMessage = new ChatListMessage();
                 chatListMessage.setType(Type.MSG_CHAT_LIST);
                 send(chatListMessage);
+                break;
+            case "/create_chat":
+                tokens = line.split( " ", 2);
+                if (tokens.length < 2) {
+                    throw new UserErrorException("Illegal input: list of ids is needed.");
+                }
+                List<Long> ids = new ArrayList<>();
+                for (String id : tokens[1].split(",")) {
+                    try {
+                        ids.add(Long.valueOf(id.trim()));
+                    } catch (IllegalArgumentException e) {
+                        throw new UserErrorException("Illegal input: not all ids are numbers.");
+                    }
+                }
+                CreateChatMessage createChatMessage = new CreateChatMessage();
+                createChatMessage.setType(Type.MSG_CHAT_CREATE);
+                createChatMessage.setUsersId(ids);
+                send(createChatMessage);
                 break;
             default:
                 log.error("Invalid input: " + line);

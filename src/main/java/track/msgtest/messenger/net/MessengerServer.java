@@ -39,6 +39,7 @@ public class MessengerServer {
         UserStore userStore = new PostgresUserStore(databaseManager.connect());
         MessageStore messageStore = new PostgresMessageStore(databaseManager.connect());
 
+        log.info("Server starts accepting connections.");
         while (true) {
             Socket clntSock = serverSocket.accept();
 
