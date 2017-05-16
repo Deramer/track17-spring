@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import track.msgtest.messenger.messages.*;
 import track.msgtest.messenger.net.*;
+import track.msgtest.messenger.teacher.client.inputhandlers.InputController;
 
 
 /**
@@ -43,6 +44,8 @@ public class MessengerClient {
     private OutputStream out;
 
     private boolean isActive = true;
+
+    private InputController inputController = new InputController();
 
     public Protocol getProtocol() {
         return protocol;
@@ -167,101 +170,9 @@ public class MessengerClient {
      */
     public void processInput(String line) throws IOException, ProtocolException, UserErrorException {
         String[] tokens = line.split(" ", 2);
-        log.info("Tokens: {}", Arrays.toString(tokens));
+        log.debug("Tokens: {}", Arrays.toString(tokens));
         String cmdType = tokens[0];
-        switch (cmdType) {
-            case "/login":
-                tokens = line.split(" ", 3);
-                if (tokens.length < 3) {
-                    throw new UserErrorException("/login has less than 3 tokens.");
-                }
-                LoginMessage logMsg = new LoginMessage(tokens[1], tokens[2]);
-                send(logMsg);
-                break;
-            case "/help":
-                // TODO: реализация
-                break;
-            case "/text":
-                tokens = line.split(" ", 3);
-                if (tokens.length < 3) {
-                    throw new UserErrorException("/text has less than 3 tokens.");
-                }
-                TextMessage sendMessage = new TextMessage();
-                sendMessage.setType(Type.MSG_TEXT);
-                try {
-                    sendMessage.setChatId(Long.parseLong(tokens[1]));
-                } catch (NumberFormatException e) {
-                    throw new UserErrorException("Chat id must be Long.");
-                }
-                sendMessage.setText(tokens[2]);
-                send(sendMessage);
-                break;
-            case "/signup":
-                tokens = line.split(" ", 3);
-                if (tokens.length < 3) {
-                    throw new UserErrorException("/signup has less than 3 tokens.");
-                }
-                SignUpMessage signUpMessage = new SignUpMessage();
-                signUpMessage.setType(Type.MSG_SIGNUP);
-                signUpMessage.setLogin(tokens[1]);
-                signUpMessage.setPassword(tokens[2]);
-                send(signUpMessage);
-                break;
-            case "/info":
-                tokens = line.split(" ",2);
-                InfoMessage infoMessage = new InfoMessage();
-                infoMessage.setType(Type.MSG_INFO);
-                if (tokens.length > 1) {
-                    try {
-                        infoMessage.setUserId(Long.valueOf(tokens[1]));
-                    } catch (IllegalArgumentException e) {
-                        throw new UserErrorException("Wrong id for info message.");
-                    }
-                }
-                send(infoMessage);
-                break;
-            case "/chat_list":
-                ChatListMessage chatListMessage = new ChatListMessage();
-                chatListMessage.setType(Type.MSG_CHAT_LIST);
-                send(chatListMessage);
-                break;
-            case "/create_chat":
-                tokens = line.split( " ", 2);
-                if (tokens.length < 2) {
-                    throw new UserErrorException("Illegal input: list of ids is needed.");
-                }
-                List<Long> ids = new ArrayList<>();
-                for (String id : tokens[1].split(",")) {
-                    try {
-                        ids.add(Long.valueOf(id.trim()));
-                    } catch (IllegalArgumentException e) {
-                        throw new UserErrorException("Illegal input: not all ids are numbers.");
-                    }
-                }
-                CreateChatMessage createChatMessage = new CreateChatMessage();
-                createChatMessage.setType(Type.MSG_CHAT_CREATE);
-                createChatMessage.setUsersId(ids);
-                send(createChatMessage);
-                break;
-            case "/chat_hist":
-                tokens = line.split(" ",2);
-                if (tokens.length < 2) {
-                    throw new UserErrorException("Illegal input: chat id is needed.");
-                }
-                Long chatId;
-                try {
-                    chatId = Long.valueOf(tokens[1]);
-                } catch (IllegalArgumentException e) {
-                    throw new UserErrorException("Chat id must be Long.");
-                }
-                ChatHistoryMessage chatHistoryMessage = new ChatHistoryMessage();
-                chatHistoryMessage.setType(Type.MSG_CHAT_HIST);
-                chatHistoryMessage.setChatId(chatId);
-                send(chatHistoryMessage);
-                break;
-            default:
-                log.error("Invalid input: " + line);
-        }
+        inputController.handler(cmdType).handle(this, line);
     }
 
     /**
@@ -305,9 +216,17 @@ public class MessengerClient {
             log.error("Application failed.", e);
         } finally {
             if (client != null) {
-                // TODO
-//                client.close();
+                client.close();
             }
+        }
+    }
+
+    public void close() {
+        try {
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            log.warn("Error during close()", e);
         }
     }
 }

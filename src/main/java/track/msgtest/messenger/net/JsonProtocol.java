@@ -33,7 +33,7 @@ public class JsonProtocol implements Protocol {
             log.error("Couldn't decode message", e);
             return null;
         }
-        log.info("decoded: {}", msg);
+        log.debug("decoded: {}", msg);
         return msg;
     }
 
@@ -41,6 +41,7 @@ public class JsonProtocol implements Protocol {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String jsonStr = objectMapper.writeValueAsString(msg);
+            log.debug("encoded: {}", msg);
             return jsonStr.getBytes();
         } catch (JsonProcessingException e) {
             log.error("Couldn't encode message", e);
