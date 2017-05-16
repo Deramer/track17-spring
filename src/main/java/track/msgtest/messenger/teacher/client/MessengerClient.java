@@ -126,6 +126,10 @@ public class MessengerClient {
                 System.out.println(msg.getSenderId());
                 System.out.println(((TextMessage)msg).getText());
                 break;
+            case MSG_INFO_RESULT:
+                System.out.println("ID: " + ((InfoResultMessage)msg).getUserId());
+                System.out.println("name: " + ((InfoResultMessage)msg).getName());
+                break;
             default:
                 System.out.println("Not supported type of message");
                 break;
@@ -177,6 +181,19 @@ public class MessengerClient {
                 signUpMessage.setLogin(tokens[1]);
                 signUpMessage.setPassword(tokens[2]);
                 send(signUpMessage);
+                break;
+            case "/info":
+                tokens = line.split(" ",2);
+                InfoMessage infoMessage = new InfoMessage();
+                infoMessage.setType(Type.MSG_INFO);
+                if (tokens.length > 1) {
+                    try {
+                        infoMessage.setUserId(Long.valueOf(tokens[1]));
+                    } catch (IllegalArgumentException e) {
+                        throw new UserErrorException("Wrong id for info message.");
+                    }
+                }
+                send(infoMessage);
                 break;
             default:
                 log.error("Invalid input: " + line);

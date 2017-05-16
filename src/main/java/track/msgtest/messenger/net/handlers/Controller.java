@@ -1,5 +1,6 @@
 package track.msgtest.messenger.net.handlers;
 
+import track.msgtest.messenger.messages.InfoMessage;
 import track.msgtest.messenger.messages.Type;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class Controller {
         map.put(Type.MSG_LOGIN, new LoginHandler());
         map.put(Type.MSG_TEXT, new TextHandler());
         map.put(Type.MSG_SIGNUP, new SignUpHandler());
+        map.put(Type.MSG_INFO, new InfoHandler());
     }
 
     public Handler handler(Type type) {
