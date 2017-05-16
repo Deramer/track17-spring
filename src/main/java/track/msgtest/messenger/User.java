@@ -21,6 +21,22 @@ public class User {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
     @Override
     public String toString() {
         return "User{" +

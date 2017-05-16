@@ -27,7 +27,6 @@ import track.msgtest.messenger.store.UserStore;
 public class Session implements Runnable {
     private static Logger log = LoggerFactory.getLogger(Session.class);
     private static volatile HashMap<Long, Session> userSessionMap;
-    Object lock;
 
     private UserStore userStore;
     private MessageStore messageStore;

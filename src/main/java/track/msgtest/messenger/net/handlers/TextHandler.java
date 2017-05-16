@@ -12,6 +12,7 @@ import java.util.List;
  * Created by arseniy on 18.04.17.
  */
 public class TextHandler implements Handler {
+
     public void handle(Session session, Message msg) throws HandlingException, IOException, ProtocolException {
         session.getLog().info("/text received, {}", msg);
         TextMessage txtMsg = (TextMessage) msg;

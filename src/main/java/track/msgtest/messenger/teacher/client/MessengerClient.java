@@ -29,7 +29,7 @@ public class MessengerClient {
     /**
      * Механизм логирования позволяет более гибко управлять записью данных в лог (консоль, файл и тд)
      * */
-    static Logger log = LoggerFactory.getLogger(MessengerClient.class);
+    private static Logger log = LoggerFactory.getLogger(MessengerClient.class);
 
     /**
      * Протокол, хост и порт инициализируются из конфига

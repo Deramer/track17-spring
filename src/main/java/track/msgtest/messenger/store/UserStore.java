@@ -12,7 +12,7 @@ public interface UserStore {
     /**
      * Обновить информацию о пользователе
      */
-    User updateUser(User user);
+    User updateUser(User userWas, User userWouldBe);
 
     /**
      *

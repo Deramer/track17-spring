@@ -17,10 +17,10 @@ import java.util.concurrent.Executors;
  */
 public class MessengerServer {
 
-    static Logger log = LoggerFactory.getLogger(MessengerServer.class);
+    private static Logger log = LoggerFactory.getLogger(MessengerServer.class);
 
     private static int port = 19000;
-    private static int threadNum = 4;
+    private static int threadNum = 10;
 
     MessengerServer() {}
 
@@ -45,16 +45,6 @@ public class MessengerServer {
             SocketAddress clientAddress = clntSock.getRemoteSocketAddress();
             log.info("Handling client at " + clientAddress);
             pool.execute(new Session(clntSock, new StringProtocol(), userStore, messageStore));
-            /*
-            InputStream in = clntSock.getInputStream();
-            OutputStream out = clntSock.getOutputStream();
-
-            while ((recvMsgSize = in.read(recieveBuf)) != -1) {
-                out.write(recieveBuf, 0, recvMsgSize);
-            }
-
-            clntSock.close();
-            */
         }
     }
 

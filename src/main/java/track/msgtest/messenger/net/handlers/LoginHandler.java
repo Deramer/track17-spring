@@ -1,5 +1,7 @@
 package track.msgtest.messenger.net.handlers;
 
+import org.slf4j.*;
+import org.slf4j.Logger;
 import track.msgtest.messenger.User;
 import track.msgtest.messenger.messages.LoginMessage;
 import track.msgtest.messenger.messages.Message;
@@ -15,7 +17,9 @@ import java.util.logging.*;
  * Created by arseniy on 18.04.17.
  */
 public class LoginHandler implements Handler {
+    private static Logger log = LoggerFactory.getLogger(Session.class);
 
+    @Override
     public void handle(Session session, Message initMsg) throws HandlingException, IOException, ProtocolException {
         if (initMsg.getType() != Type.MSG_LOGIN) {
             throw new HandlingException("Wrong type for Login handler.");
@@ -26,12 +30,20 @@ public class LoginHandler implements Handler {
             StatusMessage newMsg = new StatusMessage();
             newMsg.setStatus(false);
             newMsg.setType(Type.MSG_STATUS);
-            session.send(newMsg);
+            try {
+                session.send(newMsg);
+            } catch (IOException | ProtocolException e) {
+                log.error("Send failed, {}", e);
+            }
         } else {
             StatusMessage newMsg = new StatusMessage();
             newMsg.setStatus(true);
             newMsg.setType(Type.MSG_STATUS);
-            session.send(newMsg);
+            try {
+                session.send(newMsg);
+            } catch (IOException | ProtocolException e) {
+                log.error("Send failed, {}", e);
+            }
             if (session.getUser() != null) {
                 session.removeFromHash(session.getUser().getId());
             }
@@ -45,7 +57,11 @@ public class LoginHandler implements Handler {
             StatusMessage newMsg = new StatusMessage();
             newMsg.setStatus(false);
             newMsg.setType(Type.MSG_STATUS);
-            session.send(newMsg);
+            try {
+                session.send(newMsg);
+            } catch (IOException | ProtocolException e) {
+                log.error("Send failed, {}", e);
+            }
         } else {
             handle(session, msg);
         }
