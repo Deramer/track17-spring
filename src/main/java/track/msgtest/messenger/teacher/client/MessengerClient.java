@@ -10,14 +10,8 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import track.msgtest.messenger.messages.LoginMessage;
-import track.msgtest.messenger.messages.Message;
-import track.msgtest.messenger.messages.TextMessage;
-import track.msgtest.messenger.messages.Type;
-import track.msgtest.messenger.net.Protocol;
-import track.msgtest.messenger.net.ProtocolException;
-import track.msgtest.messenger.net.StringProtocol;
-import track.msgtest.messenger.net.UserErrorException;
+import track.msgtest.messenger.messages.*;
+import track.msgtest.messenger.net.*;
 
 
 /**
@@ -120,7 +114,21 @@ public class MessengerClient {
      * Реагируем на входящее сообщение
      */
     public void onMessage(Message msg) {
-        log.info("Message received: {}", msg);
+        log.debug("Message received: {}", msg);
+        switch (msg.getType()) {
+            case MSG_STATUS:
+                System.out.print("Status: ");
+                System.out.println(((StatusMessage) msg).getStatus());
+                break;
+            case MSG_TEXT:
+                System.out.print("Message from chat ");
+                System.out.println(msg.getSenderId());
+                System.out.println(((TextMessage)msg).getText());
+                break;
+            default:
+                System.out.println("Not supported type of message");
+                break;
+        }
     }
 
     /**
@@ -179,7 +187,7 @@ public class MessengerClient {
         MessengerClient client = new MessengerClient();
         client.setHost("localhost");
         client.setPort(19000);
-        client.setProtocol(new StringProtocol());
+        client.setProtocol(new JsonProtocol());
 
         try {
             client.initSocket();

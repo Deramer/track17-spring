@@ -8,6 +8,8 @@ public class ChatMessage extends Message {
     private String text;
     private String timestamp;
 
+    public ChatMessage() {}
+
     public ChatMessage(Long senderId, String text, String timestamp) {
         this.senderId = senderId;
         this.text = text;
