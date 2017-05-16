@@ -88,10 +88,11 @@ public class Session implements Runnable {
                 final byte[] slice = Arrays.copyOfRange(buffer, 0, readBytes);
                 Message msg = protocol.decode(slice);
 
-                if (user == null && msg.getType() != Type.MSG_LOGIN) {
+                if (user == null && (msg.getType() != Type.MSG_LOGIN && msg.getType() != Type.MSG_SIGNUP)) {
                     StatusMessage newMsg = new StatusMessage();
                     newMsg.setStatus(false);
                     newMsg.setType(Type.MSG_STATUS);
+                    newMsg.setText("Please log in (you can sign up).");
                     send(newMsg);
                     continue;
                 }

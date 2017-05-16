@@ -14,6 +14,7 @@ public class TypeToClass {
         typeToClass.put(Type.MSG_LOGIN.toString(), new LoginMessage());
         typeToClass.put(Type.MSG_CHAT.toString(), new ChatMessage());
         typeToClass.put(Type.MSG_STATUS.toString(), new StatusMessage());
+        typeToClass.put(Type.MSG_SIGNUP.toString(), new SignUpMessage());
     }
 
     public Object getObj(String type) {

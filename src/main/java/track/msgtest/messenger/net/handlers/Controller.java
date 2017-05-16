@@ -14,6 +14,7 @@ public class Controller {
         map = new HashMap<>();
         map.put(Type.MSG_LOGIN, new LoginHandler());
         map.put(Type.MSG_TEXT, new TextHandler());
+        map.put(Type.MSG_SIGNUP, new SignUpHandler());
     }
 
     public Handler handler(Type type) {

@@ -16,7 +16,7 @@ import java.io.IOException;
  * Created by arseniy on 18.04.17.
  */
 public class JsonProtocol implements Protocol {
-    private static Logger log = LoggerFactory.getLogger(StringProtocol.class);
+    private static Logger log = LoggerFactory.getLogger(JsonProtocol.class);
 
     private TypeToClass typeToClass = new TypeToClass();
 
@@ -25,9 +25,10 @@ public class JsonProtocol implements Protocol {
         ObjectMapper objectMapper = new ObjectMapper();
         String type;
         Message msg;
+        String str = new String(bytes);
         try {
-            type = objectMapper.readTree(bytes).path("type").asText();
-            msg = (Message)objectMapper.readValue(bytes, typeToClass.getObj(type).getClass());
+            type = objectMapper.readTree(str).path("type").asText();
+            msg = (Message)objectMapper.readValue(str, typeToClass.getObj(type).getClass());
         } catch (IOException e) {
             log.error("Couldn't decode message", e);
             return null;

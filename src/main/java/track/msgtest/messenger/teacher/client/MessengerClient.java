@@ -119,6 +119,7 @@ public class MessengerClient {
             case MSG_STATUS:
                 System.out.print("Status: ");
                 System.out.println(((StatusMessage) msg).getStatus());
+                System.out.println(((StatusMessage) msg).getText());
                 break;
             case MSG_TEXT:
                 System.out.print("Message from chat ");
@@ -166,8 +167,17 @@ public class MessengerClient {
                 sendMessage.setText(tokens[2]);
                 send(sendMessage);
                 break;
-            // TODO: implement another types from wiki
-
+            case "/signup":
+                tokens = line.split(" ", 3);
+                if (tokens.length < 3) {
+                    throw new UserErrorException("/signup has less than 3 tokens.");
+                }
+                SignUpMessage signUpMessage = new SignUpMessage();
+                signUpMessage.setType(Type.MSG_SIGNUP);
+                signUpMessage.setLogin(tokens[1]);
+                signUpMessage.setPassword(tokens[2]);
+                send(signUpMessage);
+                break;
             default:
                 log.error("Invalid input: " + line);
         }

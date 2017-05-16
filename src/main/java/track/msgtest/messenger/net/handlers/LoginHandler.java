@@ -20,7 +20,7 @@ public class LoginHandler implements Handler {
     private static Logger log = LoggerFactory.getLogger(Session.class);
 
     @Override
-    public void handle(Session session, Message initMsg) throws HandlingException, IOException, ProtocolException {
+    public void handle(Session session, Message initMsg) throws HandlingException, IOException {
         if (initMsg.getType() != Type.MSG_LOGIN) {
             throw new HandlingException("Wrong type for Login handler.");
         }
@@ -30,6 +30,7 @@ public class LoginHandler implements Handler {
             StatusMessage newMsg = new StatusMessage();
             newMsg.setStatus(false);
             newMsg.setType(Type.MSG_STATUS);
+            newMsg.setText("Login failed. Check your login and password.");
             try {
                 session.send(newMsg);
             } catch (IOException | ProtocolException e) {
@@ -39,6 +40,7 @@ public class LoginHandler implements Handler {
             StatusMessage newMsg = new StatusMessage();
             newMsg.setStatus(true);
             newMsg.setType(Type.MSG_STATUS);
+            newMsg.setText("Successful login!");
             try {
                 session.send(newMsg);
             } catch (IOException | ProtocolException e) {

@@ -5,6 +5,7 @@ package track.msgtest.messenger.messages;
  */
 public class StatusMessage extends Message {
     private boolean status;
+    private String text;
     private Type type = Type.MSG_STATUS;
 
     public void setStatus(boolean status) {
@@ -13,5 +14,13 @@ public class StatusMessage extends Message {
 
     public boolean getStatus() {
         return status;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
     }
 }
