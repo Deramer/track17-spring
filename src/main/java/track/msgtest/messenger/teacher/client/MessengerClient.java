@@ -124,8 +124,8 @@ public class MessengerClient {
                 System.out.println(((StatusMessage) msg).getText());
                 break;
             case MSG_TEXT:
-                System.out.print("Message from chat ");
-                System.out.println(msg.getSenderId());
+                System.out.print("Message from " + msg.getSenderId() + ", from chat ");
+                System.out.println(((TextMessage)msg).getChatId());
                 System.out.println(((TextMessage)msg).getText());
                 break;
             case MSG_INFO_RESULT:
@@ -174,7 +174,7 @@ public class MessengerClient {
                 TextMessage sendMessage = new TextMessage();
                 sendMessage.setType(Type.MSG_TEXT);
                 try {
-                    sendMessage.setSenderId(Long.parseLong(tokens[1]));
+                    sendMessage.setChatId(Long.parseLong(tokens[1]));
                 } catch (NumberFormatException e) {
                     throw new UserErrorException("Chat id must be Long.");
                 }

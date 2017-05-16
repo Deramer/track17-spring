@@ -135,14 +135,14 @@ public class PostgresMessageStore implements MessageStore {
     }
 
     @Override
-    public synchronized void addMessage(Long chatId, Message message) {
+    public synchronized void addMessage(Message message) {
         if (message.getType() != Type.MSG_TEXT) {
             log.info("Wrong type of message to add, only text allowed, {}", message);
             return;
         }
         try {
             insertMessageStatement.setLong(1, message.getSenderId());
-            insertMessageStatement.setLong(2, chatId);
+            insertMessageStatement.setLong(2, ((TextMessage)message).getChatId());
             insertMessageStatement.setString(3, ((TextMessage)message).getText());
             insertMessageStatement.execute();
             insertMessageStatement.clearParameters();

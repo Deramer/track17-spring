@@ -6,6 +6,7 @@ import java.util.Objects;
  * Простое текстовое сообщение
  */
 public class TextMessage extends Message {
+    private Long chatId;
     private String text;
 
     public String getText() {
@@ -14,6 +15,14 @@ public class TextMessage extends Message {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     @Override
