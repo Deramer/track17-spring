@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import track.msgtest.messenger.messages.*;
 import track.msgtest.messenger.net.*;
 import track.msgtest.messenger.teacher.client.inputhandlers.InputController;
+import track.msgtest.messenger.teacher.client.messagehandlers.MessagesController;
 
 
 /**
@@ -46,6 +47,7 @@ public class MessengerClient {
     private boolean isActive = true;
 
     private InputController inputController = new InputController();
+    private MessagesController messagesController = new MessagesController();
 
     public Protocol getProtocol() {
         return protocol;
@@ -130,38 +132,7 @@ public class MessengerClient {
      */
     public void onMessage(Message msg) {
         log.debug("Message received: {}", msg);
-        switch (msg.getType()) {
-            case MSG_STATUS:
-                System.out.print("Status: ");
-                System.out.println(((StatusMessage) msg).getStatus());
-                System.out.println(((StatusMessage) msg).getText());
-                break;
-            case MSG_TEXT:
-                System.out.print("Message from " + msg.getSenderId() + ", from chat ");
-                System.out.println(((TextMessage)msg).getChatId());
-                System.out.println(((TextMessage)msg).getText());
-                break;
-            case MSG_INFO_RESULT:
-                System.out.println("ID: " + ((InfoResultMessage)msg).getUserId());
-                System.out.println("name: " + ((InfoResultMessage)msg).getName());
-                break;
-            case MSG_CHAT_LIST_RESULT:
-                System.out.println("Chats:");
-                for (Long chatId : ((ChatListResultMessage)msg).getChatsId()) {
-                    System.out.print(chatId + " ");
-                }
-                System.out.println("");
-                break;
-            case MSG_CHAT_HIST_RESULT:
-                for (ChatMessage chatMessage : ((ChatHistoryResultMessage)msg).getMessages()) {
-                    System.out.println(chatMessage);
-                }
-                break;
-            default:
-                System.out.println("Not supported type of message");
-                log.warn("Not supported type of message, {}", msg.getType());
-                break;
-        }
+        messagesController.handler(msg.getType()).handle(msg);
     }
 
     /**
