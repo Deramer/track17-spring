@@ -31,4 +31,8 @@ public class ChatMessage extends Message {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+
+    public String toString() {
+        return "From " + senderId + " at " + timestamp + ":\n" + text;
+    }
 }

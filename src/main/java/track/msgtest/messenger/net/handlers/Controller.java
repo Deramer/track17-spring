@@ -19,6 +19,7 @@ public class Controller {
         map.put(Type.MSG_INFO, new InfoHandler());
         map.put(Type.MSG_CHAT_LIST, new ChatListHandler());
         map.put(Type.MSG_CHAT_CREATE, new CreateChatHandler());
+        map.put(Type.MSG_CHAT_HIST, new ChatHistoryHandler());
     }
 
     public Handler handler(Type type) {

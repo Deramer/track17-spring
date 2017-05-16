@@ -20,6 +20,8 @@ public class TypeToClass {
         typeToClass.put(Type.MSG_CHAT_LIST.toString(), new ChatListMessage());
         typeToClass.put(Type.MSG_CHAT_LIST_RESULT.toString(), new ChatListResultMessage());
         typeToClass.put(Type.MSG_CHAT_CREATE.toString(), new CreateChatMessage());
+        typeToClass.put(Type.MSG_CHAT_HIST.toString(), new ChatHistoryMessage());
+        typeToClass.put(Type.MSG_CHAT_HIST_RESULT.toString(), new ChatHistoryResultMessage());
     }
 
     public Object getObj(String type) {

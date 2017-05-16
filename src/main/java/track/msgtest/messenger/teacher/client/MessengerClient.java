@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,6 +76,10 @@ public class MessengerClient {
         this.isActive = isActive;
     }
 
+    public InputStream getIn() {
+        return in;
+    }
+
     public void initSocket() throws IOException {
         Socket socket = new Socket(host, port);
         in = socket.getInputStream();
@@ -89,7 +94,12 @@ public class MessengerClient {
             while (!Thread.currentThread().isInterrupted() && isActive == true) {
                 try {
                     // Здесь поток блокируется на ожидании данных
-                    int read = in.read(buf);
+                    int read;
+                    try {
+                        read = in.read(buf);
+                    } catch (SocketException e) {
+                        return;
+                    }
                     if (read > 0) {
 
                         // По сети передается поток байт, его нужно раскодировать с помощью протокола
@@ -138,6 +148,11 @@ public class MessengerClient {
                     System.out.print(chatId + " ");
                 }
                 System.out.println("");
+                break;
+            case MSG_CHAT_HIST_RESULT:
+                for (ChatMessage chatMessage : ((ChatHistoryResultMessage)msg).getMessages()) {
+                    System.out.println(chatMessage);
+                }
                 break;
             default:
                 System.out.println("Not supported type of message");
@@ -228,6 +243,22 @@ public class MessengerClient {
                 createChatMessage.setUsersId(ids);
                 send(createChatMessage);
                 break;
+            case "/chat_hist":
+                tokens = line.split(" ",2);
+                if (tokens.length < 2) {
+                    throw new UserErrorException("Illegal input: chat id is needed.");
+                }
+                Long chatId;
+                try {
+                    chatId = Long.valueOf(tokens[1]);
+                } catch (IllegalArgumentException e) {
+                    throw new UserErrorException("Chat id must be Long.");
+                }
+                ChatHistoryMessage chatHistoryMessage = new ChatHistoryMessage();
+                chatHistoryMessage.setType(Type.MSG_CHAT_HIST);
+                chatHistoryMessage.setChatId(chatId);
+                send(chatHistoryMessage);
+                break;
             default:
                 log.error("Invalid input: " + line);
         }
@@ -258,6 +289,7 @@ public class MessengerClient {
             while (client.getIsActive()) {
                 String input = scanner.nextLine();
                 if ("q".equals(input)) {
+                    client.getIn().close();
                     client.setIsActive(false);
                     return;
                 }
